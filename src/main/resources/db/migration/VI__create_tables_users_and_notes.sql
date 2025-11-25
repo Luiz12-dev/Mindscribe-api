@@ -1,0 +1,20 @@
+CREATE TABLE tb_users (
+    id UUID DEFAULT gen_randon_uuid PRIMARY KEY,
+    username VARCHAR(50) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    password VARCHAR (255) NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE tb_notes (
+    id UUID DEFAULT gen_randon_uuid PRIMARY KEY,
+    title VARCHAR(200) NOT NULL,
+    content TEXT, 
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    user_id UUID NOT NULL,
+    CONSTRAINT fk_notes_user
+        FOREIGN KEY (user_id)
+        REFERENCES tb_users(id)
+        ON DELETE CASCADE
+);
