@@ -1,0 +1,36 @@
+package br.com.evernot.project.controller;
+import java.util.UUID;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import br.com.evernot.project.dto.NoteRequestDto;
+import br.com.evernot.project.dto.NoteResponseDto;
+import br.com.evernot.project.service.NoteService;
+import jakarta.validation.Valid;
+
+@RestController
+@RequestMapping("/users")
+public class NoteController {
+
+    private final NoteService noteService;
+
+    public NoteController(NoteService noteService){
+        this.noteService=noteService;
+    }
+
+    @PostMapping("/{userId}/notes")
+    public ResponseEntity<NoteResponseDto> createNote(@Valid @RequestBody NoteRequestDto req, @PathVariable UUID userId){
+
+        NoteResponseDto res = noteService.createNote(req, userId);
+    
+        return new ResponseEntity<>(res, HttpStatus.CREATED);
+        
+    }
+
+}
