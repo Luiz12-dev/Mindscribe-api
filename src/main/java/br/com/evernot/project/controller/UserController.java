@@ -2,6 +2,7 @@ package br.com.evernot.project.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,6 +29,11 @@ public class UserController {
         UserResponseDto res = userService.createUser(req);
 
         return new ResponseEntity<>(res, HttpStatus.CREATED);
+    }
+
+    @GetMapping
+    public String teste(){
+        return "EndpointFuncioanndo corretamente !";
     }
 
 }
