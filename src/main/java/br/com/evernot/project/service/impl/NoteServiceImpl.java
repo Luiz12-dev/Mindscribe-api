@@ -1,7 +1,9 @@
 package br.com.evernot.project.service.impl;
 
 
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -37,7 +39,64 @@ public class NoteServiceImpl implements NoteService{
         newNote.setTitle(req.title());
         newNote.setUser(user);
 
-        NoteEntity savedNote = noteRepository.save(newNote);  
-        return NoteResponseDto.sucess(savedNote);
+        NoteEntity savedNote = noteRepository.save(newNote); 
+
+        return toResponse(savedNote);
       }
+
+
+    @Override
+    public NoteResponseDto updateNote(UUID userId, UUID noteId, NoteRequestDto req){
+        
+        NoteEntity note = noteRepository.findById(noteId)
+            .orElseThrow(()-> new RuntimeException("Note not found"));
+
+        if(!note.getUser().getId().equals(userId)){
+            throw new RuntimeException("Incorrect note owner");
+        }
+
+        note.setTitle(req.title());
+        note.setContent(req.content());
+
+        NoteEntity savedNote = noteRepository.save(note);
+
+        return toResponse(savedNote);
+        
+    }
+
+
+
+
+    @Override
+    public List<NoteResponseDto> userNotes(UUID id){
+
+        return noteRepository.findAllByUserId(id).stream()
+        .map(this::toResponse)
+        .collect(Collectors.toList());
+        
+    }
+
+    @Override
+    public void deleteNote(UUID userId, UUID noteId){
+
+        NoteEntity note = noteRepository.findById(noteId)
+        .orElseThrow(()-> new RuntimeException("Note not found"));
+
+        if(!note.getUser().getId().equals(userId)){
+            throw new RuntimeException("Incorrect note owner");
+        }
+
+        noteRepository.delete(note);
+    }
+
+
+    public NoteResponseDto toResponse(NoteEntity req){
+        return new NoteResponseDto(
+            req.getId(),
+            req.getTitle(),
+            req.getContent(),
+            req.getCreatedAt(),
+            req.getUpdatedAt()
+        );
+    }
 }

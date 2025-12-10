@@ -12,4 +12,8 @@ public interface NoteService {
 
     List<NoteResponseDto> userNotes(UUID id);
 
+    NoteResponseDto updateNote(UUID userId, UUID noteId,NoteRequestDto req);
+
+    void deleteNote(UUID userId, UUID noteId);
+
 }
