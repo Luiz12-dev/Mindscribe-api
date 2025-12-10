@@ -1,8 +1,11 @@
 package br.com.evernot.project.controller;
+import java.util.List;
 import java.util.UUID;
 
+import org.apache.catalina.connector.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,6 +34,13 @@ public class NoteController {
     
         return new ResponseEntity<>(res, HttpStatus.CREATED);
         
+    }
+
+    @GetMapping("/{userId}/notes")
+    public ResponseEntity<List<NoteResponseDto>> userNotes(@PathVariable UUID userId){
+        List<NoteResponseDto> allNotes = noteService.userNotes(userId);
+
+        return ResponseEntity.ok(allNotes);
     }
 
 }
