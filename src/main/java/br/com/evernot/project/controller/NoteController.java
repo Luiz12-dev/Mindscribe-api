@@ -5,9 +5,11 @@ import java.util.UUID;
 import org.apache.catalina.connector.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -41,6 +43,22 @@ public class NoteController {
         List<NoteResponseDto> allNotes = noteService.userNotes(userId);
 
         return ResponseEntity.ok(allNotes);
+    }
+
+    @PutMapping("/{userId}/notes/{noteId}")
+    public ResponseEntity<NoteResponseDto> updateNote(@PathVariable UUID userId, @PathVariable UUID noteId, @Valid @RequestBody NoteRequestDto req ){
+        NoteResponseDto updateNote = noteService.updateNote(userId, noteId, req);
+
+        return ResponseEntity.ok(updateNote);
+    }
+
+    @DeleteMapping("/{userId}/notes/{noteId}")
+    public ResponseEntity<Void> deleteNote(@PathVariable UUID userId, @PathVariable UUID noteId){
+
+        noteService.deleteNote(userId, noteId);
+
+    
+        return ResponseEntity.noContent().build();
     }
 
 }
