@@ -1,6 +1,7 @@
 package br.com.evernot.project.service.impl;
 
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import br.com.evernot.project.domain.UserEntity;
@@ -9,11 +10,13 @@ import br.com.evernot.project.dto.UserResponseDto;
 import br.com.evernot.project.repository.UserRepository;
 import br.com.evernot.project.service.UserService;
 import lombok.RequiredArgsConstructor;
+
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService{
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public UserResponseDto createUser(UserRequestDto req){
         
@@ -28,7 +31,7 @@ public class UserServiceImpl implements UserService{
 
         newUser.setEmail(req.email());
         newUser.setUsername(req.username());
-        newUser.setPassword(req.password());
+        newUser.setPassword(passwordEncoder.encode(req.password()));
 
         UserEntity savedUser = userRepository.save(newUser);
 
