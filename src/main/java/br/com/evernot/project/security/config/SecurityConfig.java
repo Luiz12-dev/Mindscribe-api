@@ -31,6 +31,13 @@ public class SecurityConfig {
     @Bean 
     public SecurityFilterChain filterChain (HttpSecurity http)throws Exception{
         http
+            .cors(cors -> cors.configurationSource(request -> {
+                var corsConfiguration = new org.springframework.web.cors.CorsConfiguration();
+                corsConfiguration.setAllowedOrigins(java.util.List.of("http://localhost:4200")); // Libera o Angular
+                corsConfiguration.setAllowedMethods(java.util.List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+                corsConfiguration.setAllowedHeaders(java.util.List.of("*"));
+                return corsConfiguration;
+                }))
             .csrf(AbstractHttpConfigurer::disable)
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(authorize -> authorize
