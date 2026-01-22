@@ -8,12 +8,12 @@ import br.com.evernot.project.dto.NoteResponseDto;
 
 public interface NoteService {
 
-    NoteResponseDto createNote(NoteRequestDto req, UUID Id);
+    NoteResponseDto createNote(NoteRequestDto req, String userEmail);
 
-    List<NoteResponseDto> userNotes(UUID id);
+    List<NoteResponseDto> getAllNotes(String userEmail);
 
-    NoteResponseDto updateNote(UUID userId, UUID noteId,NoteRequestDto req);
+    NoteResponseDto updateNote(String userEmail, UUID noteId,NoteRequestDto req);
 
-    void deleteNote(UUID userId, UUID noteId);
+    void deleteNote(String userEmail, UUID noteId);
 
 }

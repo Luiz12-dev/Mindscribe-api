@@ -8,7 +8,6 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 import br.com.evernot.project.domain.NoteEntity;
-import br.com.evernot.project.domain.UserEntity;
 import br.com.evernot.project.dto.NoteRequestDto;
 import br.com.evernot.project.dto.NoteResponseDto;
 import br.com.evernot.project.repository.NoteRepository;
@@ -27,10 +26,10 @@ public class NoteServiceImpl implements NoteService{
     }
 
     @Override
-    public NoteResponseDto createNote(NoteRequestDto req, UUID Id){
+    public NoteResponseDto createNote(NoteRequestDto req, String userEmail){
 
-        UserEntity user = userRepository.findById(Id)
-        .orElseThrow(()-> new RuntimeException("Usuário não econtrado"));
+        var user = userRepository.findByEmail(userEmail)
+        .orElseThrow(()-> new RuntimeException("Usuário não econtrado"));  
 
 
         NoteEntity newNote = new NoteEntity();
@@ -46,12 +45,12 @@ public class NoteServiceImpl implements NoteService{
 
 
     @Override
-    public NoteResponseDto updateNote(UUID userId, UUID noteId, NoteRequestDto req){
+    public NoteResponseDto updateNote(String userEmail, UUID noteId, NoteRequestDto req){
         
         NoteEntity note = noteRepository.findById(noteId)
             .orElseThrow(()-> new RuntimeException("Note not found"));
 
-        if(!note.getUser().getId().equals(userId)){
+        if(!note.getUser().getEmail().equals(userEmail)){
             throw new RuntimeException("Incorrect note owner");
         }
 
@@ -68,21 +67,25 @@ public class NoteServiceImpl implements NoteService{
 
 
     @Override
-    public List<NoteResponseDto> userNotes(UUID id){
+    public List<NoteResponseDto> getAllNotes(String userEmail){
 
-        return noteRepository.findAllByUserId(id).stream()
-        .map(this::toResponse)
+        var user = userRepository.findByEmail(userEmail)
+        .orElseThrow(()-> new RuntimeException("Usuário não econtrado"));
+
+        var notes = noteRepository.findAllByUserId(user.getId());
+
+        return notes.stream()
+        .map(note -> toResponse(note))
         .collect(Collectors.toList());
-        
     }
 
     @Override
-    public void deleteNote(UUID userId, UUID noteId){
+    public void deleteNote(String userEmail, UUID noteId){
 
         NoteEntity note = noteRepository.findById(noteId)
         .orElseThrow(()-> new RuntimeException("Note not found"));
 
-        if(!note.getUser().getId().equals(userId)){
+        if(!note.getUser().getEmail().equals(userEmail)){
             throw new RuntimeException("Incorrect note owner");
         }
 
