@@ -2,9 +2,9 @@ package br.com.evernot.project.controller;
 import java.util.List;
 import java.util.UUID;
 
-import org.apache.catalina.connector.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,7 +20,7 @@ import br.com.evernot.project.service.NoteService;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/notes")
 public class NoteController {
 
     private final NoteService noteService;
@@ -29,33 +29,40 @@ public class NoteController {
         this.noteService=noteService;
     }
 
-    @PostMapping("/{userId}/notes")
-    public ResponseEntity<NoteResponseDto> createNote(@Valid @RequestBody NoteRequestDto req, @PathVariable UUID userId){
+    @PostMapping
+    public ResponseEntity<NoteResponseDto> createNote(@Valid @RequestBody NoteRequestDto req, Authentication authentication){
 
-        NoteResponseDto res = noteService.createNote(req, userId);
-    
-        return new ResponseEntity<>(res, HttpStatus.CREATED);
-        
+        var userEmail = authentication.getName();
+
+        NoteResponseDto createdNote = noteService.createNote(req, userEmail);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdNote);
     }
 
-    @GetMapping("/{userId}/notes")
-    public ResponseEntity<List<NoteResponseDto>> userNotes(@PathVariable UUID userId){
-        List<NoteResponseDto> allNotes = noteService.userNotes(userId);
+    @GetMapping
+    public ResponseEntity<List<NoteResponseDto>> getMyNotes(Authentication authentication){
+        var userEmail = authentication.getName();
 
-        return ResponseEntity.ok(allNotes);
+        List<NoteResponseDto> notes = noteService.getAllNotes(userEmail);
+
+        return ResponseEntity.ok(notes);
     }
 
-    @PutMapping("/{userId}/notes/{noteId}")
-    public ResponseEntity<NoteResponseDto> updateNote(@PathVariable UUID userId, @PathVariable UUID noteId, @Valid @RequestBody NoteRequestDto req ){
-        NoteResponseDto updateNote = noteService.updateNote(userId, noteId, req);
+    @PutMapping("/{noteId}")
+    public ResponseEntity<NoteResponseDto> updateNote(Authentication authentication, @PathVariable UUID noteId, @Valid @RequestBody NoteRequestDto req ){
 
-        return ResponseEntity.ok(updateNote);
+        var userEmail = authentication.getName();
+
+        NoteResponseDto updatedNote = noteService.updateNote( userEmail, noteId, req);
+        return ResponseEntity.ok(updatedNote);
     }
 
-    @DeleteMapping("/{userId}/notes/{noteId}")
-    public ResponseEntity<Void> deleteNote(@PathVariable UUID userId, @PathVariable UUID noteId){
+    @DeleteMapping("/{noteId}")
+    public ResponseEntity<Void> deleteNote(Authentication authentication, @PathVariable UUID noteId){
 
-        noteService.deleteNote(userId, noteId);
+        var userEmail = authentication.getName();
+
+        noteService.deleteNote(userEmail, noteId);
 
     
         return ResponseEntity.noContent().build();
