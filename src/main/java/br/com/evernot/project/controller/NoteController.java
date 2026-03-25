@@ -5,6 +5,7 @@ import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.evernot.project.domain.UserEntity;
 import br.com.evernot.project.dto.NoteRequestDto;
 import br.com.evernot.project.dto.NoteResponseDto;
 import br.com.evernot.project.service.NoteService;
@@ -30,11 +32,11 @@ public class NoteController {
     }
 
     @PostMapping
-    public ResponseEntity<NoteResponseDto> createNote(@Valid @RequestBody NoteRequestDto req, Authentication authentication){
+    public ResponseEntity<NoteResponseDto> createNote(@Valid @RequestBody NoteRequestDto req, @AuthenticationPrincipal UserEntity usuarioLogado){
 
-        var userEmail = authentication.getName();
+       String emailUsuario = usuarioLogado.getEmail();
 
-        NoteResponseDto createdNote = noteService.createNote(req, userEmail);
+       NoteResponseDto createdNote = noteService.createNote(req, emailUsuario);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(createdNote);
     }
@@ -58,12 +60,9 @@ public class NoteController {
     }
 
     @DeleteMapping("/{noteId}")
-    public ResponseEntity<Void> deleteNote(Authentication authentication, @PathVariable UUID noteId){
-
-        var userEmail = authentication.getName();
-
-        noteService.deleteNote(userEmail, noteId);
-
+    public ResponseEntity<Void> deleteNote(@AuthenticationPrincipal UserEntity userEntity, @PathVariable UUID noteId){
+        
+        noteService.deleteNote(userEntity.getEmail(), noteId);
     
         return ResponseEntity.noContent().build();
     }
