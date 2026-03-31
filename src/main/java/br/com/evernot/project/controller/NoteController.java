@@ -51,9 +51,9 @@ public class NoteController {
     }
 
     @PutMapping("/{noteId}")
-    public ResponseEntity<NoteResponseDto> updateNote(Authentication authentication, @PathVariable UUID noteId, @Valid @RequestBody NoteRequestDto req ){
+    public ResponseEntity<NoteResponseDto> updateNote(@AuthenticationPrincipal UserEntity user, @PathVariable UUID noteId, @Valid @RequestBody NoteRequestDto req ){
 
-        var userEmail = authentication.getName();
+        String userEmail = user.getEmail();
 
         NoteResponseDto updatedNote = noteService.updateNote( userEmail, noteId, req);
         return ResponseEntity.ok(updatedNote);
