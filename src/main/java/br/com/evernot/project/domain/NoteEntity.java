@@ -34,7 +34,6 @@ public class NoteEntity {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @NotBlank(message = "The title cant be empty")
     @Column(nullable = false)
     private String title;
 
